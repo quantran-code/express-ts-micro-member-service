@@ -86,7 +86,9 @@ describe('public /members identity', () => {
     const unknownWithKey = await request(app).get('/does-not-exist').set(withServiceKey);
 
     expect(unknownWithKey.status).toBe(404);
-    expect(unknownWithKey.body).toEqual({ error: 'Not Found' });
+    expect(unknownWithKey.body.error).toBe('Not Found');
+    expect(typeof unknownWithKey.body.requestId).toBe('string');
+    expect(unknownWithKey.body.requestId.length).toBeGreaterThan(0);
   });
 
   it('still responds 200 on /health without any headers', async () => {

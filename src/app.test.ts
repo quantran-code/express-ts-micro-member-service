@@ -50,7 +50,9 @@ describe('member-service app', () => {
       const withKey = await request(app).get('/does-not-exist').set(withServiceKey);
 
       expect(withKey.status).toBe(404);
-      expect(withKey.body).toEqual({ error: 'Not Found' });
+      expect(withKey.body.error).toBe('Not Found');
+      expect(typeof withKey.body.requestId).toBe('string');
+      expect(withKey.body.requestId.length).toBeGreaterThan(0);
     });
   });
 
