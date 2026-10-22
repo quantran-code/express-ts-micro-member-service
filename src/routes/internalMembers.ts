@@ -1,6 +1,11 @@
 import { RequestHandler, Router } from 'express';
 import { HttpError } from '../errors/httpError';
-import { createMember, findMemberByEmail, findMemberById } from '../repositories/memberRepository';
+import {
+  createMember,
+  findMemberByEmail,
+  findMemberById,
+  listMembers,
+} from '../repositories/memberRepository';
 
 export interface CreateMemberBody {
   name?: string;
@@ -54,7 +59,12 @@ export const getMemberHandler: RequestHandler<MemberIdParams> = (req, res, next)
   res.status(200).json(member);
 };
 
+export const listMembersHandler: RequestHandler<Record<string, never>> = (req, res) => {
+  res.status(200).json(listMembers());
+};
+
 export const internalMembersRouter = Router();
 
 internalMembersRouter.post('/members', createMemberHandler);
+internalMembersRouter.get('/members', listMembersHandler);
 internalMembersRouter.get('/members/:id', getMemberHandler);
