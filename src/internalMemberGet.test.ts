@@ -19,7 +19,7 @@ describe('GET /internal/members/:id', () => {
       .set(withServiceKey);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 404 when no member has that id', async () => {

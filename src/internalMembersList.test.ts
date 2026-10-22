@@ -19,8 +19,8 @@ describe('GET /internal/members', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
-      { id: 1, name: 'Ada', email: 'ada@library.test' },
-      { id: 2, name: 'Grace', email: 'grace@library.test' },
+      { id: 1, name: 'Ada', email: 'ada@library.test', active: true },
+      { id: 2, name: 'Grace', email: 'grace@library.test', active: true },
     ]);
   });
 

@@ -2,6 +2,7 @@ export interface Member {
   id: number;
   name: string;
   email: string;
+  active: boolean;
 }
 
 export interface CreateMemberInput {
@@ -17,6 +18,7 @@ export function createMember(input: CreateMemberInput): Member {
     id: nextId,
     name: input.name.trim(),
     email: input.email.trim().toLowerCase(),
+    active: true,
   };
 
   nextId += 1;
@@ -53,6 +55,18 @@ export function updateMember(id: number, input: UpdateMemberInput): Member | und
   if (typeof input.email === 'string' && input.email.trim()) {
     member.email = input.email.trim().toLowerCase();
   }
+
+  return member;
+}
+
+export function setMemberActive(id: number, active: boolean): Member | undefined {
+  const member = findMemberById(id);
+
+  if (!member) {
+    return undefined;
+  }
+
+  member.active = active;
 
   return member;
 }

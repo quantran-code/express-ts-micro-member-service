@@ -20,8 +20,8 @@ describe('GET /members', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
-      { id: 1, name: 'Ada', email: 'ada@library.test' },
-      { id: 2, name: 'Grace', email: 'grace@library.test' },
+      { id: 1, name: 'Ada', email: 'ada@library.test', active: true },
+      { id: 2, name: 'Grace', email: 'grace@library.test', active: true },
     ]);
   });
 
@@ -46,7 +46,7 @@ describe('GET /members/:id', () => {
     const response = await request(app).get('/members/1').set(asLibrarian);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 200 for the member whose own id matches', async () => {
@@ -55,7 +55,7 @@ describe('GET /members/:id', () => {
     const response = await request(app).get('/members/1').set(asMember);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 403 when a member requests another member', async () => {
@@ -95,7 +95,12 @@ describe('PATCH /members/:id', () => {
       .send({ name: '  Ada Lovelace  ' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada Lovelace', email: 'ada@library.test' });
+    expect(response.body).toEqual({
+      id: 1,
+      name: 'Ada Lovelace',
+      email: 'ada@library.test',
+      active: true,
+    });
 
     const readBack = await request(app).get('/members/1').set(asLibrarian);
 
@@ -129,7 +134,7 @@ describe('PATCH /members/:id', () => {
       .send({ email: 'ADA@Library.test' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 400 when the email is not a valid address', async () => {
@@ -154,7 +159,7 @@ describe('PATCH /members/:id', () => {
     const response = await request(app).patch('/members/1').set(asLibrarian).send({});
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 200 and leaves the member unchanged for unknown fields', async () => {
@@ -166,7 +171,7 @@ describe('PATCH /members/:id', () => {
       .send({ role: 'librarian', name: '   ' });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+    expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test', active: true });
   });
 
   it('responds 403 when a member patches another member', async () => {

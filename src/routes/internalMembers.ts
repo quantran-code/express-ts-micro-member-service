@@ -5,6 +5,7 @@ import {
   findMemberByEmail,
   findMemberById,
   listMembers,
+  setMemberActive,
 } from '../repositories/memberRepository';
 
 export interface CreateMemberBody {
@@ -14,6 +15,10 @@ export interface CreateMemberBody {
 
 export interface MemberIdParams {
   id: string;
+}
+
+export interface SetMemberActiveBody {
+  active?: unknown;
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,8 +68,39 @@ export const listMembersHandler: RequestHandler<Record<string, never>> = (req, r
   res.status(200).json(listMembers());
 };
 
+export const setMemberActiveHandler: RequestHandler<
+  MemberIdParams,
+  unknown,
+  SetMemberActiveBody
+> = (req, res, next) => {
+  const id = Number(req.params.id);
+
+  // A malformed id is treated as an absent member.
+  if (!Number.isInteger(id) || id <= 0 || !findMemberById(id)) {
+    next(new HttpError(404, 'Member not found'));
+    return;
+  }
+
+  const active: unknown = req.body?.active;
+
+  if (typeof active !== 'boolean') {
+    next(new HttpError(400, 'active must be a boolean'));
+    return;
+  }
+
+  const member = setMemberActive(id, active);
+
+  if (!member) {
+    next(new HttpError(404, 'Member not found'));
+    return;
+  }
+
+  res.status(200).json(member);
+};
+
 export const internalMembersRouter = Router();
 
 internalMembersRouter.post('/members', createMemberHandler);
 internalMembersRouter.get('/members', listMembersHandler);
 internalMembersRouter.get('/members/:id', getMemberHandler);
+internalMembersRouter.patch('/members/:id/active', setMemberActiveHandler);

@@ -62,8 +62,27 @@ describe('member-service app', () => {
         .send({ name: '  Ada  ', email: 'Ada@Library.test' });
 
       expect(response.status).toBe(201);
-      expect(response.body).toEqual({ id: 1, name: 'Ada', email: 'ada@library.test' });
+      expect(response.body).toEqual({
+        id: 1,
+        name: 'Ada',
+        email: 'ada@library.test',
+        active: true,
+      });
       expect(listMembers()).toHaveLength(1);
+    });
+
+    it('defaults the new member to active', async () => {
+      const response = await request(app)
+        .post('/internal/members')
+        .set(withServiceKey)
+        .send({ name: 'Ada', email: 'ada@library.test' });
+
+      expect(response.status).toBe(201);
+      expect(response.body.active).toBe(true);
+
+      const [stored] = listMembers();
+
+      expect(stored.active).toBe(true);
     });
 
     it('keeps incrementing ids by one from 1', async () => {
