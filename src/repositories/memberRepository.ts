@@ -30,6 +30,10 @@ export function findMemberByEmail(email: string): Member | undefined {
   return members.find((member) => member.email === normalised);
 }
 
+export function findMemberById(id: number): Member | undefined {
+  return members.find((member) => member.id === id);
+}
+
 export function listMembers(): readonly Member[] {
   return members;
 }
