@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction, RequestHandler } from 'expres
 import { HttpError } from './errors/httpError';
 import { requireServiceKey } from './middleware/requireServiceKey';
 import { internalMembersRouter } from './routes/internalMembers';
+import { membersRouter } from './routes/members';
 
 const app = express();
 
@@ -11,9 +12,9 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', service: 'member-service' });
 });
 
-// Every route other than /health requires the internal service key.
+// Every route other than /health and the public /members surface requires the internal service key.
 const serviceKeyGate: RequestHandler = (req, res, next) => {
-  if (req.path === '/health') {
+  if (req.path === '/health' || req.path === '/members' || req.path.startsWith('/members/')) {
     next();
     return;
   }
@@ -24,6 +25,7 @@ const serviceKeyGate: RequestHandler = (req, res, next) => {
 app.use(serviceKeyGate);
 
 app.use('/internal', internalMembersRouter);
+app.use('/members', membersRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not Found' });

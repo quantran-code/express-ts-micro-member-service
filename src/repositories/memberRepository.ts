@@ -34,6 +34,41 @@ export function findMemberById(id: number): Member | undefined {
   return members.find((member) => member.id === id);
 }
 
+export interface UpdateMemberInput {
+  name?: string;
+  email?: string;
+}
+
+export function updateMember(id: number, input: UpdateMemberInput): Member | undefined {
+  const member = findMemberById(id);
+
+  if (!member) {
+    return undefined;
+  }
+
+  if (typeof input.name === 'string' && input.name.trim()) {
+    member.name = input.name.trim();
+  }
+
+  if (typeof input.email === 'string' && input.email.trim()) {
+    member.email = input.email.trim().toLowerCase();
+  }
+
+  return member;
+}
+
+export function deleteMember(id: number): boolean {
+  const index = members.findIndex((member) => member.id === id);
+
+  if (index === -1) {
+    return false;
+  }
+
+  members.splice(index, 1);
+
+  return true;
+}
+
 export function listMembers(): readonly Member[] {
   return members;
 }
