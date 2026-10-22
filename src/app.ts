@@ -1,5 +1,7 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import { HttpError } from './errors/httpError';
+import { requireServiceKey } from './middleware/requireServiceKey';
+import { internalMembersRouter } from './routes/internalMembers';
 
 const app = express();
 
@@ -9,7 +11,19 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', service: 'member-service' });
 });
 
-// TODO: mount this service's routes here once implemented.
+// Every route other than /health requires the internal service key.
+const serviceKeyGate: RequestHandler = (req, res, next) => {
+  if (req.path === '/health') {
+    next();
+    return;
+  }
+
+  requireServiceKey(req, res, next);
+};
+
+app.use(serviceKeyGate);
+
+app.use('/internal', internalMembersRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Not Found' });
